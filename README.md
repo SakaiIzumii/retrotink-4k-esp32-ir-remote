@@ -1,9 +1,11 @@
 # RT4K ESP32-S3 IR Remote
 
 一个基于 ESP32-S3 的红外遥控器项目，提供 Web 控制面板、AP 兜底、Wi-Fi Manager、状态可视化与 OTA 升级。
-<img width="966" height="1598" alt="control" src="https://github.com/user-attachments/assets/e32b284b-aea8-4d43-9bf1-8bcf14ee6c08" />
-<img width="982" height="1598" alt="Setting" src="https://github.com/user-attachments/assets/7047c5ab-5903-41a8-afb9-af97bfb1e0a0" />
-<img width="940" height="1594" alt="wifi-manager" src="https://github.com/user-attachments/assets/782a17a1-7b7c-46e9-a18e-b23f5a0f5900" />
+
+| Control | Setting | Wi-Fi Manager |
+|---|---|---|
+| <img src="[Control](https://github.com/user-attachments/assets/e32b284b-aea8-4d43-9bf1-8bcf14ee6c08)" width="260"> | <img src="[Setting](https://github.com/user-attachments/assets/7047c5ab-5903-41a8-afb9-af97bfb1e0a0)" width="260"> | <img src="[Wifi-Manager](https://github.com/user-attachments/assets/782a17a1-7b7c-46e9-a18e-b23f5a0f5900)" width="260"> |
+
 
 ## 主要功能
 
