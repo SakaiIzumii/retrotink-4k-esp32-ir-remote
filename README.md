@@ -4,7 +4,7 @@
 
 | Control | Setting | Wi-Fi Manager |
 |---|---|---|
-| <img src="[Control](https://github.com/user-attachments/assets/e32b284b-aea8-4d43-9bf1-8bcf14ee6c08)" width="260"> | <img src="[Setting](https://github.com/user-attachments/assets/7047c5ab-5903-41a8-afb9-af97bfb1e0a0)" width="260"> | <img src="[Wifi-Manager](https://github.com/user-attachments/assets/782a17a1-7b7c-46e9-a18e-b23f5a0f5900)" width="260"> |
+| <img src="https://github.com/user-attachments/assets/e32b284b-aea8-4d43-9bf1-8bcf14ee6c08" width="260"> | <img src="https://github.com/user-attachments/assets/7047c5ab-5903-41a8-afb9-af97bfb1e0a0" width="260"> | <img src="https://github.com/user-attachments/assets/782a17a1-7b7c-46e9-a18e-b23f5a0f5900" width="260"> |
 
 
 ## 主要功能
