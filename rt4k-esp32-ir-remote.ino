@@ -128,7 +128,7 @@ const char index_html[] PROGMEM = R"rawliteral(
       :root { --app-height: 100dvh; }
     }
     * { box-sizing: border-box; }
-    html, body { width: 100%; height: var(--app-height); overflow: hidden; }
+    html, body { width: 100%; height: var(--app-height); overflow: hidden; touch-action: manipulation; }
     body { 
       background: var(--bg); color: var(--text);
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif; 
@@ -141,6 +141,7 @@ const char index_html[] PROGMEM = R"rawliteral(
       position: relative; display: flex; flex-direction: column;
       border-left: 1px solid var(--border); border-right: 1px solid var(--border);
       box-shadow: 0 0 40px rgba(0,0,0,0.4);
+      touch-action: manipulation;
     }
     .header {
       padding: 15px 20px 10px; display: flex; justify-content: space-between;
@@ -188,7 +189,7 @@ const char index_html[] PROGMEM = R"rawliteral(
     .grid-3 { grid-template-columns: repeat(3, 1fr); }
     .grid-4 { grid-template-columns: repeat(4, 1fr); }
     .d-pad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 16px; }
-    button { background: rgba(255,255,255,0.06); color: var(--text); border: none; border-radius: 12px; padding: 14px 0; font-size: 13px; font-weight: 500; cursor: pointer; transition: 0.1s; }
+    button { background: rgba(255,255,255,0.06); color: var(--text); border: none; border-radius: 12px; padding: 14px 0; font-size: 13px; font-weight: 500; cursor: pointer; transition: 0.1s; touch-action: manipulation; }
     button:active { background: rgba(255,255,255,0.15); transform: scale(0.94); }
     .btn-red { color: var(--accent-red); font-weight: 600; background: rgba(255,69,58,0.1); }
     .btn-red:active { background: rgba(255,69,58,0.2); }
@@ -204,8 +205,14 @@ const char index_html[] PROGMEM = R"rawliteral(
       border-top: 1px solid var(--border); display: flex; justify-content: space-around;
       padding: 10px 20px var(--safe-bottom); z-index: 100;
     }
-    .tab-item { display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); font-size: 10px; font-weight: 500; cursor: pointer; width: 60px; transition: 0.2s; }
+    .tab-item { display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-muted); font-size: 10px; font-weight: 500; cursor: pointer; width: 60px; transition: 0.2s; touch-action: manipulation; border-radius: 12px; }
     .tab-item.active { color: var(--accent-blue); }
+    .press-feedback {
+      transform: scale(0.90) translateY(1px) !important;
+      filter: brightness(1.2);
+      box-shadow: 0 0 0 1px rgba(10,132,255,0.38), 0 0 16px rgba(10,132,255,0.28);
+      transition: transform 0.08s ease, filter 0.08s ease, box-shadow 0.08s ease;
+    }
     .tab-icon { font-size: 20px; margin-bottom: 4px; }
     .page { display: none; animation: fadeIn 0.2s ease-out; }
     .page.active { display: block; }
@@ -285,10 +292,15 @@ const char index_html[] PROGMEM = R"rawliteral(
     let wifiScanItems = [];
     let viewportLockedForInput = false;
     let lockedViewportHeight = 0;
+    let lastTouchEndTs = 0;
     try {
       apPopupShown = localStorage.getItem(AP_POPUP_ACK_KEY) === "1";
     } catch (e) {
       apPopupShown = false;
+    }
+
+    function haptic(ms) {
+      if (navigator.vibrate) navigator.vibrate(ms || 16);
     }
 
     function isTextInputElement(el) {
@@ -320,6 +332,38 @@ const char index_html[] PROGMEM = R"rawliteral(
       if (h && h > 0) {
         document.documentElement.style.setProperty('--app-height', h + 'px');
       }
+    }
+
+    function bindMobileInteractionGuards() {
+      document.addEventListener('click', (e) => {
+        if (e.target.closest('button, .tab-item')) {
+          haptic(16);
+        }
+      }, { passive: true });
+
+      const applyPressFeedback = (el) => {
+        if (!el) return;
+        el.classList.add('press-feedback');
+        window.setTimeout(() => el.classList.remove('press-feedback'), 120);
+      };
+      document.addEventListener('pointerdown', (e) => {
+        const target = e.target.closest('button, .tab-item');
+        if (target) applyPressFeedback(target);
+      }, { passive: true });
+
+      // iOS: prevent double-tap zoom on non-input areas while keeping input behavior normal.
+      document.addEventListener('touchend', (e) => {
+        const now = Date.now();
+        const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : "";
+        const isInput = tag === "input" || tag === "textarea" || tag === "select";
+        if (!isInput && now - lastTouchEndTs <= 320) {
+          e.preventDefault();
+        }
+        lastTouchEndTs = now;
+      }, { passive: false });
+
+      // Safari pinch/double gesture guard
+      document.addEventListener('gesturestart', (e) => e.preventDefault(), { passive: false });
     }
 
     function flashLED() {
@@ -497,7 +541,6 @@ const char index_html[] PROGMEM = R"rawliteral(
             showToast("Send Failed");
           });
       }
-      if (navigator.vibrate) navigator.vibrate(25);
     }
     
     function switchTab(tabId) {
@@ -629,6 +672,7 @@ const char index_html[] PROGMEM = R"rawliteral(
 
     // 页面加载完毕后启动第一次查询
     window.onload = () => {
+      bindMobileInteractionGuards();
       syncViewportHeight();
       updateDashboard();
     };
@@ -1177,7 +1221,8 @@ void setup() {
   server.on("/", []() { 
     // 发送网页时也添加 Connection: close 避免长连接积压
     server.sendHeader("Connection", "close");
-    server.send(200, "text/html", index_html); 
+    // Use PROGMEM response to avoid large RAM copy when serving HTML.
+    server.send_P(200, "text/html", index_html);
   });
   
   server.on("/ir", []() {
