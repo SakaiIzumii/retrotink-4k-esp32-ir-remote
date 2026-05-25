@@ -41,6 +41,19 @@
 - `Preferences.h`
 - `esp_wifi.h`
 
+## RetroTINK 4K 前置步骤（必须）
+
+在使用本项目前，必须先把仓库中的 `ir_remote.txt` 复制到 **RetroTINK 4K 的 SD 卡根目录**，然后重启 RetroTINK 4K。
+
+步骤：
+
+1. 将本仓库 `ir_remote.txt` 复制到 SD 卡根目录（不是子目录）。
+2. 将 SD 卡插回 RetroTINK 4K。
+3. 重启 RetroTINK 4K，让遥控映射生效。
+
+> 如果未执行这一步，即使 ESP32 端网页和红外发送正常，RT4K 也可能无响应。
+
+
 ## 快速开始
 
 1. 在 `wifiList[]` 中填入你的 2.4G Wi-Fi（或留空只用 AP 模式）。
