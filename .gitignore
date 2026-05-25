@@ -1,0 +1,17 @@
+# macOS
+.DS_Store
+
+# Arduino build artifacts
+*.bin
+*.elf
+*.map
+*.hex
+*.eep
+
+# IDE / temp
+.vscode/
+.idea/
+*.log
+
+# Local secrets
+secrets.h
